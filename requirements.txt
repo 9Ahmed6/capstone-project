@@ -1,0 +1,50 @@
+# =====================================================================
+# Action-Based Video Understanding System
+# Week 1 baseline + dependencies anticipated for Weeks 2-8.
+# Versions are pinned with conservative lower bounds; tighten as needed.
+# Tested against Python 3.10 / 3.11.
+# =====================================================================
+
+# ---------- Core UI ----------
+streamlit>=1.36,<2.0
+
+# ---------- Config / utilities ----------
+pyyaml>=6.0
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+pydantic>=2.6,<3.0
+
+# ---------- Numerical / data ----------
+numpy>=1.26,<2.0
+pandas>=2.1,<3.0
+
+# ---------- Video & image processing (Week 2, 4) ----------
+opencv-python>=4.9.0.80
+Pillow>=10.2.0
+imageio>=2.34.0
+imageio-ffmpeg>=0.4.9
+ffmpeg-python>=0.2.0
+
+# ---------- Audio processing (Week 2, 5) ----------
+librosa>=0.10.1
+soundfile>=0.12.1
+
+# ---------- NLP / embeddings (Week 3) ----------
+sentence-transformers>=2.7.0
+scikit-learn>=1.4.0
+
+# ---------- Object detection (Week 4) ----------
+ultralytics>=8.1.0           # YOLOv8
+
+# ---------- Pose / hands (Week 5) ----------
+mediapipe>=0.10.9
+
+# ---------- Multimodal model + fallbacks (Week 6) ----------
+torch>=2.2.0
+torchvision>=0.17.0
+transformers>=4.40.0
+accelerate>=0.28.0
+
+# ---------- Dev / notebooks ----------
+jupyterlab>=4.0.0
+ipykernel>=6.29.0
