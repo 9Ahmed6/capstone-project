@@ -1,0 +1,36 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- Virtual envs ---
+.venv/
+venv/
+env/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# --- Project artifacts ---
+# Keep the folders, ignore their contents.
+data/videos/*
+!data/videos/.gitkeep
+data/samples/*
+!data/samples/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# --- Local config overrides ---
+configs/settings.local.yaml
+.env
+
+# --- Model weights ---
+*.pt
+*.bin
+*.safetensors
