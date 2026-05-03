@@ -7,6 +7,12 @@ Week 1 scope:
     * Show a clean placeholder flow so weeks 2–7 can plug real pipeline modules in
       without restructuring the UI.
 
+Week 2 upgrade:
+    * replace place holder video pipeline with:
+     - metadata extraction
+     - frame extraction
+     - audio extraction
+
 Run:
     streamlit run streamlit_app.py
 """
@@ -18,6 +24,14 @@ from pathlib import Path
 
 import streamlit as st
 import yaml
+
+from src.video_pipeline import (
+    extract_video_metadata,
+    save_metadata,
+    extract_frames,
+)
+
+from src.audio_pipeline import extract_audio
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -43,9 +57,22 @@ def load_action_library(path: Path) -> dict:
 
 
 def ensure_dirs(settings: dict) -> None:
-    """Make sure the directories referenced by settings.yaml exist."""
+    """Make sure required project directories exist."""
+
+    # Existing Week 1 paths from settings.yaml
     for key in ("videos_dir", "samples_dir", "outputs_dir", "logs_dir"):
-        Path(PROJECT_ROOT / settings["paths"][key]).mkdir(parents=True, exist_ok=True)
+        Path(PROJECT_ROOT / settings["paths"][key]).mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+    # Week 2 additions
+    (PROJECT_ROOT / "data" / "frames").mkdir(parents=True, exist_ok=True)
+    (PROJECT_ROOT / "data" / "audio").mkdir(parents=True, exist_ok=True)
+    (PROJECT_ROOT / "outputs" / "metadata").mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -68,13 +95,79 @@ def placeholder_match_schema(action_text: str, library: dict) -> dict:
 
 
 def placeholder_run_pipeline(video_path: Path, action_text: str) -> dict:
-    """Stub: weeks 2–6 will replace this with real video/audio/pose/fusion calls."""
+    """
+    Week 2:
+        * Extract metadata
+        * Extract frames
+        * Extract audio
+    Week 3+:
+        * Schema matching
+        * Visual
+        * Audio
+        * Pose
+        * Fusion
+    """
+
+    # --------------------------------------------
+    # STEP A: Extract metadata
+    # --------------------------------------------
+    metadata = extract_video_metadata(str(video_path))
+
+    metadata_output = (
+        PROJECT_ROOT
+        / "outputs"
+        / "metadata"
+        / f"{video_path.stem}_metadata.json"
+    )
+
+    save_metadata(metadata, str(metadata_output))
+
+    # --------------------------------------------
+    # STEP B: Extract frames
+    # Save frames into:
+    # data/frames/video_name/
+    # --------------------------------------------
+    frame_output_dir = (
+        PROJECT_ROOT
+        / "data"
+        / "frames"
+        / video_path.stem
+    )
+
+    frame_count = extract_frames(
+        str(video_path),
+        str(frame_output_dir),
+        sample_interval=1,  # 1 frame per second
+    )
+
+    # --------------------------------------------
+    # STEP C: Extract audio
+    # --------------------------------------------
+    audio_output_path = (
+        PROJECT_ROOT
+        / "data"
+        / "audio"
+        / f"{video_path.stem}.wav"
+    )
+
+    audio_file = extract_audio(
+        str(video_path),
+        str(audio_output_path),
+    )
+
+    # --------------------------------------------
+    # STEP D: Return structured Week 2 output
+    # --------------------------------------------
     return {
         "video": str(video_path.name),
         "query": action_text,
+        "metadata": metadata,
+        "frames_extracted": frame_count,
+        "audio_file": str(audio_file) if audio_file else None,
         "segments": [],
-        "note": "Pipeline not yet implemented — Week 1 placeholder.",
+        "note": "Week 2 preprocessing complete.",
     }
+
 
 
 # ---------------------------------------------------------------------------
@@ -94,7 +187,8 @@ def main() -> None:
     # ---- Sidebar -----------------------------------------------------------
     with st.sidebar:
         st.header("Project status")
-        st.success("Week 1 — project skeleton ready.")
+        # st.success("Week 1 — project skeleton ready.")
+        st.success("Week 2 — video ingestion + preprocessing ready.")
         st.caption(
             f"Schema library: **{len(library.get('actions', []))}** actions "
             f"(v{library.get('version', '?')})"
@@ -150,7 +244,7 @@ def main() -> None:
         with st.status("Running placeholder pipeline…", expanded=True) as status:
             st.write("Matching action against schema library…")
             match = placeholder_match_schema(action_text, library)
-            st.write("Running video pipeline (stub)…")
+            st.write("Running Week 2 preprocessing pipeline…")
             result = placeholder_run_pipeline(target_path, action_text)
             status.update(label="Done", state="complete")
 
@@ -159,6 +253,19 @@ def main() -> None:
 
         st.subheader("Pipeline output")
         st.json(result)
+        # ---- Metadata file confirmation --------------------------
+        st.success("Metadata extracted and saved.")
+
+        # ---- Audio preview ---------------------------------------
+        if result.get("audio_file"):
+            st.subheader("Extracted audio preview")
+            st.audio(result["audio_file"])
+
+        # ---- Frame folder path -----------------------------------
+        st.subheader("Frame output location")
+        st.code(
+            str(PROJECT_ROOT / "data" / "frames" / target_path.stem)
+        )
 
         st.subheader("Video preview")
         st.video(str(target_path))
@@ -167,7 +274,7 @@ def main() -> None:
     st.divider()
     st.caption(
         f"{settings['project']['name']} v{settings['project']['version']} — "
-        "Week 1 placeholder build."
+        "Week 2 preprocessing build."
     )
 
 
