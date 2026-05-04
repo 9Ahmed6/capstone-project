@@ -34,6 +34,8 @@ from src.video_pipeline import (
 from src.audio_pipeline import extract_audio
 from src.schema_matcher import match_action
 
+from src.pose_pipeline import run_pose_pipeline
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -242,12 +244,17 @@ def main() -> None:
         with target_path.open("wb") as f:
             f.write(uploaded.getbuffer())
 
-        with st.status("Running placeholder pipeline…", expanded=True) as status:
-            st.write("Matching action against schema library…")
+        with st.status("Running  pipeline…", expanded=True) as status:
+            st.write("Matching action against schema library…: Running Week 3 pipeline")
             match = match_action(action_text, library)
-            st.write("Running Week 2 preprocessing pipeline…")
+            st.write("Extracting frames + metadata...: Running Week 2 preprocessing pipeline")
             result = placeholder_run_pipeline(target_path, action_text)
             status.update(label="Done", state="complete")
+            st.write("Detecting pose, face, and hand landmarks using MediaPipe...: Running Week 5 pipeline")
+            pose_result = run_pose_pipeline(
+                str(target_path),
+                "outputs/pose"
+            )
 
         st.subheader("Schema match result")
 
@@ -277,7 +284,6 @@ def main() -> None:
 
         st.json(match)
 
-
         st.subheader("Pipeline output")
         st.json(result)
         # ---- Metadata file confirmation --------------------------
@@ -294,8 +300,16 @@ def main() -> None:
             str(PROJECT_ROOT / "data" / "frames" / target_path.stem)
         )
 
+        #display mediapipe results
+        st.subheader("Pose Pipeline Output")
+        st.write("CSV:", pose_result["csv"])
+        st.video(str(PROJECT_ROOT / pose_result['video']))
+        print(PROJECT_ROOT / pose_result['video'])
+        
+        #display input video
         st.subheader("Video preview")
         st.video(str(target_path))
+        print(str(target_path))
 
     # ---- Footer ------------------------------------------------------------
     st.divider()
