@@ -1,97 +1,118 @@
 {
-  "version": "0.1.0",
-  "description": "Schema library mapping canonical action descriptions to multimodal matching rules. Each entry describes one action and the visual/audio/pose evidence that should be present in a matching video segment.",
-  "schema_fields": {
-    "id": "Unique snake_case identifier.",
-    "name": "Human-readable action name.",
-    "description": "Natural language description used for embedding matching in Week 3.",
-    "aliases": "Alternative phrasings the user might type.",
-    "tags": "Free-form tags (e.g. domain, body part, environment).",
-    "visual_cues": "Object/scene labels expected from YOLO detections.",
-    "audio_cues": "Sound or speech events expected from audio analysis.",
-    "pose_cues": "Body/hand keypoint patterns expected from MediaPipe.",
-    "min_duration_sec": "Minimum plausible segment length.",
-    "max_duration_sec": "Maximum plausible segment length.",
-    "confidence_floor": "Minimum fused confidence required to keep a candidate segment."
-  },
+  "version": "2.0",
   "actions": [
     {
-      "id": "person_walking",
-      "name": "Person walking",
-      "description": "A person moves on foot at a steady walking pace through the scene.",
-      "aliases": ["walking", "person walks", "someone walking", "pedestrian"],
-      "tags": ["locomotion", "outdoor", "indoor", "full-body"],
-      "visual_cues": ["person"],
-      "audio_cues": ["footsteps"],
-      "pose_cues": ["alternating_leg_swing", "upright_torso"],
-      "min_duration_sec": 1.0,
-      "max_duration_sec": 60.0,
-      "confidence_floor": 0.45
+      "id": "GEST_001",
+      "name": "thumbs_up",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Thumb raised upward with closed fist",
+      "aliases": ["thumbs up", "like gesture"],
+      "motion": {
+        "pattern": "static",
+        "repetition": false
+      }
     },
     {
-      "id": "person_running",
-      "name": "Person running",
-      "description": "A person moves rapidly on foot with both feet leaving the ground between strides.",
-      "aliases": ["running", "jogging", "sprinting", "person runs"],
-      "tags": ["locomotion", "high-motion", "full-body"],
-      "visual_cues": ["person"],
-      "audio_cues": ["fast_footsteps", "heavy_breathing"],
-      "pose_cues": ["airborne_phase", "high_knee_lift"],
-      "min_duration_sec": 1.0,
-      "max_duration_sec": 60.0,
-      "confidence_floor": 0.50
+      "id": "GEST_002",
+      "name": "wave",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Hand moving side to side repeatedly",
+      "aliases": ["waving", "wave hello"],
+      "motion": {
+        "pattern": "oscillating",
+        "direction": "horizontal",
+        "repetition": true
+      }
     },
     {
-      "id": "person_waving",
-      "name": "Person waving",
-      "description": "A person raises one hand and moves it side to side in a greeting gesture.",
-      "aliases": ["waving", "hand wave", "saying hi", "greeting wave"],
-      "tags": ["gesture", "upper-body", "social"],
-      "visual_cues": ["person"],
-      "audio_cues": ["speech_greeting"],
-      "pose_cues": ["raised_hand_above_shoulder", "lateral_hand_oscillation"],
-      "min_duration_sec": 0.5,
-      "max_duration_sec": 5.0,
-      "confidence_floor": 0.50
+      "id": "GEST_003",
+      "name": "point",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Finger extended toward a direction",
+      "aliases": ["pointing", "pointing finger"],
+      "motion": {
+        "pattern": "static_direction",
+        "repetition": false
+      }
     },
     {
-      "id": "person_clapping",
-      "name": "Person clapping",
-      "description": "A person brings both hands together repeatedly in front of the body.",
-      "aliases": ["clapping", "applause", "applauding", "hand clap"],
-      "tags": ["gesture", "upper-body", "audio-distinct"],
-      "visual_cues": ["person"],
-      "audio_cues": ["clap", "applause"],
-      "pose_cues": ["hands_meeting_midline", "repetitive_arm_motion"],
-      "min_duration_sec": 0.5,
-      "max_duration_sec": 15.0,
-      "confidence_floor": 0.55
+      "id": "GEST_004",
+      "name": "stop",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Palm facing outward as a stop signal",
+      "aliases": ["stop gesture", "palm out"],
+      "motion": {
+        "pattern": "static",
+        "repetition": false
+      }
     },
     {
-      "id": "person_drinking",
-      "name": "Person drinking",
-      "description": "A person lifts a cup, glass, or bottle to their mouth and drinks.",
-      "aliases": ["drinking", "taking a drink", "sipping", "drinking water"],
-      "tags": ["consumption", "upper-body", "object-interaction"],
-      "visual_cues": ["person", "cup", "bottle", "wine glass"],
-      "audio_cues": ["sip", "swallow"],
-      "pose_cues": ["hand_to_mouth", "head_tilt_back"],
-      "min_duration_sec": 0.5,
-      "max_duration_sec": 10.0,
-      "confidence_floor": 0.45
+      "id": "GEST_005",
+      "name": "ok_sign",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Thumb and index finger forming a circle",
+      "aliases": ["ok gesture"],
+      "motion": {
+        "pattern": "static",
+        "repetition": false
+      }
     },
     {
-      "id": "person_sitting_down",
-      "name": "Person sitting down",
-      "description": "A person transitions from standing to sitting on a chair, sofa, or bench.",
-      "aliases": ["sitting down", "takes a seat", "sits on chair"],
-      "tags": ["transition", "full-body", "object-interaction"],
-      "visual_cues": ["person", "chair", "couch", "bench"],
-      "audio_cues": [],
-      "pose_cues": ["hip_descent", "knee_flexion"],
-      "min_duration_sec": 0.5,
-      "max_duration_sec": 5.0,
-      "confidence_floor": 0.45
+      "id": "GEST_006",
+      "name": "snap",
+      "type": "gesture",
+      "body_parts": ["hand"],
+      "description": "Finger snapping motion",
+      "aliases": ["snap fingers"],
+      "motion": {
+        "pattern": "quick_impulse",
+        "repetition": false
+      }
+    },
+    {
+      "id": "ACT_001",
+      "name": "pour_liquid",
+      "type": "complex_action",
+      "body_parts": ["hand"],
+      "objects": ["bottle", "cup"],
+      "description": "Tilting container to pour liquid",
+      "aliases": ["pouring water"],
+      "temporal": true
+    },
+    {
+      "id": "ACT_002",
+      "name": "typing",
+      "type": "complex_action",
+      "body_parts": ["both_hands"],
+      "objects": ["keyboard"],
+      "description": "Hands repeatedly pressing keys",
+      "aliases": ["typing on keyboard"],
+      "temporal": true
+    },
+    {
+      "id": "ACT_003",
+      "name": "drink",
+      "type": "complex_action",
+      "body_parts": ["hand", "mouth"],
+      "objects": ["bottle", "cup"],
+      "description": "Bringing container to mouth and drinking",
+      "aliases": ["drinking water"],
+      "temporal": true
+    },
+    {
+      "id": "ACT_004",
+      "name": "writing",
+      "type": "complex_action",
+      "body_parts": ["hand"],
+      "objects": ["pen", "paper"],
+      "description": "Hand moving to write characters",
+      "aliases": ["writing on paper"],
+      "temporal": true
     }
   ]
 }

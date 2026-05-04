@@ -32,6 +32,7 @@ from src.video_pipeline import (
 )
 
 from src.audio_pipeline import extract_audio
+from src.schema_matcher import match_action
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -78,20 +79,20 @@ def ensure_dirs(settings: dict) -> None:
 # ---------------------------------------------------------------------------
 # Placeholder pipeline (weeks 2–6 will replace the body of these functions)
 # ---------------------------------------------------------------------------
-def placeholder_match_schema(action_text: str, library: dict) -> dict:
-    """Naive substring match. Real embedding matcher arrives in Week 3."""
-    text = action_text.strip().lower()
-    if not text:
-        return {"status": "empty", "matches": []}
+# def placeholder_match_schema(action_text: str, library: dict) -> dict:
+#     """Naive substring match. Real embedding matcher arrives in Week 3."""
+#     text = action_text.strip().lower()
+#     if not text:
+#         return {"status": "empty", "matches": []}
 
-    scored = []
-    for entry in library.get("actions", []):
-        haystack = " ".join(
-            [entry["name"], entry["description"], *entry.get("aliases", [])]
-        ).lower()
-        if text in haystack or any(tok in haystack for tok in text.split()):
-            scored.append({"id": entry["id"], "name": entry["name"], "score": 0.5})
-    return {"status": "ok" if scored else "no_match", "matches": scored[:3]}
+#     scored = []
+#     for entry in library.get("actions", []):
+#         haystack = " ".join(
+#             [entry["name"], entry["description"], *entry.get("aliases", [])]
+#         ).lower()
+#         if text in haystack or any(tok in haystack for tok in text.split()):
+#             scored.append({"id": entry["id"], "name": entry["name"], "score": 0.5})
+#     return {"status": "ok" if scored else "no_match", "matches": scored[:3]}
 
 
 def placeholder_run_pipeline(video_path: Path, action_text: str) -> dict:
@@ -243,13 +244,39 @@ def main() -> None:
 
         with st.status("Running placeholder pipeline…", expanded=True) as status:
             st.write("Matching action against schema library…")
-            match = placeholder_match_schema(action_text, library)
+            match = match_action(action_text, library)
             st.write("Running Week 2 preprocessing pipeline…")
             result = placeholder_run_pipeline(target_path, action_text)
             status.update(label="Done", state="complete")
 
-        st.subheader("Schema match")
+        st.subheader("Schema match result")
+
+        if match["status"] == "matched":
+
+            st.success(f"Matched: {match['best_match']['name']}")
+            st.write("Confidence:", match["best_match"]["score"])
+
+            # Show full schema info
+            matched_entry = next(
+                a for a in library["actions"]
+                if a["id"] == match["best_match"]["id"]
+            )
+
+            st.write("Type:", matched_entry.get("type"))
+            st.write("Body parts:", matched_entry.get("body_parts"))
+
+            if "motion" in matched_entry:
+                st.write("Motion:", matched_entry["motion"])
+
+            if "objects" in matched_entry:
+                st.write("Objects:", matched_entry["objects"])
+
+        elif match["status"] == "new_schema_draft":
+            st.warning("No strong match found.")
+            st.write("Suggested new action:", match["draft"]["name"])
+
         st.json(match)
+
 
         st.subheader("Pipeline output")
         st.json(result)
