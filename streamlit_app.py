@@ -33,6 +33,8 @@ from src.video_pipeline import (
 
 from src.audio_pipeline import extract_audio
 
+from src.pose_pipeline import run_pose_pipeline
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -232,6 +234,12 @@ def main() -> None:
             st.write("Running Week 2 preprocessing pipeline…")
             result = placeholder_run_pipeline(target_path)
             status.update(label="Done", state="complete")
+       
+        st.write("Detecting pose, face, and hand landmarks using MediaPipe...: Running Week 5 pipeline")
+        pose_result = run_pose_pipeline(
+                str(target_path),
+                "outputs/pose"
+            )
 
 
 
