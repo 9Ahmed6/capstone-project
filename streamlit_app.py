@@ -32,7 +32,6 @@ from src.video_pipeline import (
 )
 
 from src.audio_pipeline import extract_audio
-from src.schema_matcher import match_action
 
 from src.pose_pipeline import run_pose_pipeline
 
@@ -97,7 +96,7 @@ def ensure_dirs(settings: dict) -> None:
 #     return {"status": "ok" if scored else "no_match", "matches": scored[:3]}
 
 
-def placeholder_run_pipeline(video_path: Path, action_text: str) -> dict:
+def placeholder_run_pipeline(video_path: Path) -> dict:
     """
     Week 2:
         * Extract metadata
@@ -163,7 +162,6 @@ def placeholder_run_pipeline(video_path: Path, action_text: str) -> dict:
     # --------------------------------------------
     return {
         "video": str(video_path.name),
-        "query": action_text,
         "metadata": metadata,
         "frames_extracted": frame_count,
         "audio_file": str(audio_file) if audio_file else None,
@@ -209,22 +207,12 @@ def main() -> None:
     )
 
     # ---- Inputs ------------------------------------------------------------
-    col_left, col_right = st.columns([1, 1])
-
-    with col_left:
-        st.subheader("1. Upload a video")
-        uploaded = st.file_uploader(
-            "Video file",
-            type=[ext.lstrip(".") for ext in settings["video"]["allowed_extensions"]],
-            help=f"Max {settings['video']['max_upload_mb']} MB. "
-                 f"Allowed: {', '.join(settings['video']['allowed_extensions'])}",
-        )
-
-    with col_right:
-        st.subheader("2. Describe the action")
-        action_text = st.text_input(
-            "Action description",
-            placeholder="e.g. 'person waving at the camera'",
+    st.subheader("1. Upload a video")
+    uploaded = st.file_uploader(
+        "Video file",
+        type=[ext.lstrip(".") for ext in settings["video"]["allowed_extensions"]],
+        help=f"Max {settings['video']['max_upload_mb']} MB. "
+        f"Allowed: {', '.join(settings['video']['allowed_extensions'])}",
         )
 
     run = st.button("Run analysis", type="primary", use_container_width=True)
@@ -234,9 +222,6 @@ def main() -> None:
         if not uploaded:
             st.error("Please upload a video first.")
             return
-        if not action_text.strip():
-            st.error("Please enter an action description.")
-            return
 
         # Save upload to data/videos so downstream modules can pick it up.
         videos_dir = PROJECT_ROOT / settings["paths"]["videos_dir"]
@@ -245,10 +230,8 @@ def main() -> None:
             f.write(uploaded.getbuffer())
 
         with st.status("Running  pipeline…", expanded=True) as status:
-            st.write("Matching action against schema library…: Running Week 3 pipeline")
-            match = match_action(action_text, library)
             st.write("Extracting frames + metadata...: Running Week 2 preprocessing pipeline")
-            result = placeholder_run_pipeline(target_path, action_text)
+            result = placeholder_run_pipeline(target_path)
             status.update(label="Done", state="complete")
             st.write("Detecting pose, face, and hand landmarks using MediaPipe...: Running Week 5 pipeline")
             pose_result = run_pose_pipeline(
@@ -256,33 +239,7 @@ def main() -> None:
                 "outputs/pose"
             )
 
-        st.subheader("Schema match result")
-
-        if match["status"] == "matched":
-
-            st.success(f"Matched: {match['best_match']['name']}")
-            st.write("Confidence:", match["best_match"]["score"])
-
-            # Show full schema info
-            matched_entry = next(
-                a for a in library["actions"]
-                if a["id"] == match["best_match"]["id"]
-            )
-
-            st.write("Type:", matched_entry.get("type"))
-            st.write("Body parts:", matched_entry.get("body_parts"))
-
-            if "motion" in matched_entry:
-                st.write("Motion:", matched_entry["motion"])
-
-            if "objects" in matched_entry:
-                st.write("Objects:", matched_entry["objects"])
-
-        elif match["status"] == "new_schema_draft":
-            st.warning("No strong match found.")
-            st.write("Suggested new action:", match["draft"]["name"])
-
-        st.json(match)
+        
 
         st.subheader("Pipeline output")
         st.json(result)
