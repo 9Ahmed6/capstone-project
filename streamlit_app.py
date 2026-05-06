@@ -33,8 +33,6 @@ from src.video_pipeline import (
 
 from src.audio_pipeline import extract_audio
 
-from src.pose_pipeline import run_pose_pipeline
-
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -215,6 +213,7 @@ def main() -> None:
         f"Allowed: {', '.join(settings['video']['allowed_extensions'])}",
         )
 
+    
     run = st.button("Run analysis", type="primary", use_container_width=True)
 
     # ---- Run ---------------------------------------------------------------
@@ -229,17 +228,12 @@ def main() -> None:
         with target_path.open("wb") as f:
             f.write(uploaded.getbuffer())
 
-        with st.status("Running  pipeline…", expanded=True) as status:
-            st.write("Extracting frames + metadata...: Running Week 2 preprocessing pipeline")
+        with st.status("Running placeholder pipeline…", expanded=True) as status:
+            st.write("Running Week 2 preprocessing pipeline…")
             result = placeholder_run_pipeline(target_path)
             status.update(label="Done", state="complete")
-            st.write("Detecting pose, face, and hand landmarks using MediaPipe...: Running Week 5 pipeline")
-            pose_result = run_pose_pipeline(
-                str(target_path),
-                "outputs/pose"
-            )
 
-        
+
 
         st.subheader("Pipeline output")
         st.json(result)
